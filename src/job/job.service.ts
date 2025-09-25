@@ -27,7 +27,7 @@ export class JobService {
   async create(
     data: Pick<
       Job,
-      'jobTitle' | 'description' | 'country' | 'state' | 'status'
+      'jobTitle' | 'description' | 'location' | 'jobLink' | 'status'
     >,
   ): Promise<Job> {
     const entity = this.repo.create(data);

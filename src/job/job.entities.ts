@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Job {
@@ -9,10 +15,10 @@ export class Job {
   jobTitle: string;
 
   @Column({ nullable: true })
-  country?: string;
+  location?: string;
 
   @Column({ nullable: true })
-  state?: string;
+  jobLink?: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -26,4 +32,3 @@ export class Job {
   @Column({ type: 'text', nullable: true })
   description?: string;
 }
-

@@ -7,8 +7,10 @@ import {
   Delete,
   Param,
   ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import { JobService } from './job.service';
+import { Job } from './job.entities';
 @Controller('job')
 export class JobController {
   constructor(private readonly service: JobService) {}
@@ -24,12 +26,17 @@ export class JobController {
     body: {
       jobTitle: string;
       description: string;
-      country: string;
-      state: string;
+      location: string;
+      jobLink: string;
       status: string;
     },
   ) {
     return this.service.create(body);
+  }
+
+  @Put(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<Job>) {
+    return this.service.update(id, data);
   }
 
   @Delete(':id')

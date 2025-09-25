@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Agent } from './agent.entities';
-import { AgentDto } from './agent.dto';
 
 @Injectable()
 export class AgentService {
@@ -11,8 +10,8 @@ export class AgentService {
     private readonly agentRepository: Repository<Agent>,
   ) {}
 
-  async create(dto: AgentDto): Promise<Agent> {
-    const agent = this.agentRepository.create(dto);
+  async create(data: Partial<Agent>): Promise<Agent> {
+    const agent = this.agentRepository.create(data);
     return await this.agentRepository.save(agent);
   }
   async findAll(): Promise<Agent[]> {

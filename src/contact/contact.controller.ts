@@ -1,24 +1,19 @@
 // src/contact/contact.controller.ts
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ContactDto } from './contact.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Contact } from './contact.entity';
+
+import { ContactService } from './contact.service';
 @Controller('contact')
 export class ContactController {
-  constructor(
-    @InjectRepository(Contact)
-    private contactRepository: Repository<Contact>,
-  ) {}
+  constructor(private readonly contactService: ContactService) {}
 
   @Post()
   create(@Body() contactDto: ContactDto) {
-    const contact = this.contactRepository.create(contactDto);
-    return this.contactRepository.save(contact);
+    return this.contactService.create(contactDto);
   }
 
   @Get()
-  findAll() {
-    return this.contactRepository.find();
+  getAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+    return this.contactService.findAll(Number(page) || 1, Number(limit) || 10);
   }
 }

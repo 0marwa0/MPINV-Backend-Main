@@ -1,25 +1,24 @@
 // src/brochure-request/brochure-request.controller.ts
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { BrochureRequestDto } from './brochure-request.dto';
-import { BrochureRequest } from './brochure.entity';
+import { BrochureRequestService } from './brochure-request.service';
 
 @Controller('brochure-requests')
 export class BrochureRequestController {
   constructor(
-    @InjectRepository(BrochureRequest)
-    private readonly brochureRequestRepository: Repository<BrochureRequest>,
+    private readonly brochureRequestService: BrochureRequestService,
   ) {}
 
   @Post()
   async create(@Body() dto: BrochureRequestDto) {
-    const brochure = this.brochureRequestRepository.create(dto);
-    return await this.brochureRequestRepository.save(brochure);
+    return await this.brochureRequestService.create(dto);
   }
 
   @Get()
-  async findAll() {
-    return await this.brochureRequestRepository.find();
+  async findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+    return await this.brochureRequestService.findAll(
+      Number(page) || 1,
+      Number(limit) || 10,
+    );
   }
 }

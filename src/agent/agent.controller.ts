@@ -1,16 +1,33 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AgentService } from './agent.service';
-import { AgentDto } from './agent.dto';
-
+import { Agent } from './agent.entities';
+import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('agent')
 export class AgentController {
   constructor(private readonly agentService: AgentService) {}
 
   @Post()
-  create(@Body() dto: AgentDto) {
-    return this.agentService.create(dto);
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() data: Partial<Agent>,
+    @UploadedFile() file: any,
+  ): Promise<Agent> {
+    const payload = { ...data };
+    if (file) {
+      payload.image = `uploads/agents/${file.filename}`;
+    }
+    return this.agentService.create(payload);
   }
-
   @Get()
   findAll() {
     return this.agentService.findAll();

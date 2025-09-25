@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommunityService } from './community.service';
 
@@ -25,17 +38,22 @@ export class CommunityController {
     return this.service.create(payload);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @UseInterceptors(FileInterceptor('logo'))
   update(
     @Param('id', ParseIntPipe) id: number,
-    @UploadedFile() file: any,
-    @Body() body: { name?: string; state_id?: number },
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
   ) {
     const payload: { name?: string; logo?: string; state_id?: number } = {};
-    if (typeof body.name !== 'undefined') payload.name = body.name;
-    if (typeof body.state_id !== 'undefined') payload.state_id = body.state_id;
-    if (file?.filename) payload.logo = `uploads/ads/${file.filename}`;
+    if (body.name) payload.name = body.name;
+    if (body.state_id) {
+      const parsed = Number(body.state_id);
+      if (!isNaN(parsed)) payload.state_id = parsed;
+    }
+    if (file?.filename) {
+      payload.logo = `uploads/ads/${file.filename}`;
+    }
     return this.service.update(id, payload);
   }
 

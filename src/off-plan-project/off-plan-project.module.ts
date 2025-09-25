@@ -11,6 +11,7 @@ import { OffPlanProject } from './off-plan-project.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([OffPlanProject]),
+
     MulterModule.register({
       storage: diskStorage({
         destination: (req, file, cb) => {
