@@ -20,7 +20,33 @@ export class CommunityController {
   constructor(private readonly service: CommunityService) {}
 
   @Get()
-  getAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+  getAll(
+    @Query('state_id') state_id?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    console.log('Received state_id:', state_id);
+    console.log('Type of state_id:', typeof state_id);
+
+    // If state_id is provided, filter by state
+    if (state_id && state_id.trim() !== '') {
+      const stateIdNum = Number(state_id);
+      console.log('Parsed state_id as number:', stateIdNum);
+
+      if (isNaN(stateIdNum)) {
+        throw new Error('Invalid state_id parameter');
+      }
+
+      console.log('Calling findByStateId with:', stateIdNum);
+      return this.service.findByStateId(
+        stateIdNum,
+        Number(page) || 1,
+        Number(limit) || 10,
+      );
+    }
+
+    console.log('No valid state_id provided, returning all communities');
+    // Otherwise return all communities
     return this.service.findAll(Number(page) || 1, Number(limit) || 10);
   }
 

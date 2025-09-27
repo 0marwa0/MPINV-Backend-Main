@@ -1,5 +1,17 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
+export interface PropertyDetail {
+  property_title: string;
+  property_type: string;
+  usage: string;
+  price: number;
+  beds: string;
+  baths: string;
+  description: string;
+  upload_image?: string; // image file path
+  upload_floor_plan_image?: string; // floor plan image file path
+}
+
 @Entity('off_plan_project')
 export class OffPlanProject {
   @PrimaryGeneratedColumn()
@@ -53,8 +65,11 @@ export class OffPlanProject {
   @Column({ type: 'varchar', length: 150, nullable: true })
   payment_pdf: string; // uploaded file path
 
-  @Column({ type: 'longtext', nullable: true })
-  property_details: string; // JSON array of property detail objects
+  @Column({
+    type: 'json',
+    nullable: true,
+  })
+  property_details: PropertyDetail[]; // Array of property detail objects
 
   @Column({ type: 'varchar', length: 150, nullable: true })
   types_pdf: string;
@@ -113,4 +128,3 @@ export class OffPlanProject {
   @Column({ type: 'varchar', length: 250, nullable: true })
   map_location: string;
 }
-

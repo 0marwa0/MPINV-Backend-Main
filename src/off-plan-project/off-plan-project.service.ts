@@ -21,11 +21,15 @@ export class OffPlanProjectService {
 
   async findOne(id: number): Promise<OffPlanProject> {
     const entity = await this.repo.findOne({ where: { id } });
-    if (!entity) throw new NotFoundException(`Off-plan project ${id} not found`);
+    if (!entity)
+      throw new NotFoundException(`Off-plan project ${id} not found`);
     return entity;
   }
 
-  async update(id: number, payload: Partial<OffPlanProject>): Promise<OffPlanProject> {
+  async update(
+    id: number,
+    payload: Partial<OffPlanProject>,
+  ): Promise<OffPlanProject> {
     const entity = await this.findOne(id);
     Object.assign(entity, payload);
     return await this.repo.save(entity);
@@ -36,5 +40,22 @@ export class OffPlanProjectService {
     if (result.affected === 0)
       throw new NotFoundException(`Off-plan project ${id} not found`);
   }
-}
 
+  async duplicate(id: number): Promise<OffPlanProject> {
+    const originalProject = await this.findOne(id);
+
+    // Create a copy of the project without the ID
+    const { id: originalId, ...projectData } = originalProject;
+
+    // Modify the title to indicate it's a duplicate
+    const duplicateData = {
+      ...projectData,
+      project_title: `${projectData.project_title} (Copy)`,
+      status: 'draft', // Set as draft for review
+    };
+
+    // Create and save the duplicate
+    const duplicateEntity = this.repo.create(duplicateData);
+    return await this.repo.save(duplicateEntity);
+  }
+}

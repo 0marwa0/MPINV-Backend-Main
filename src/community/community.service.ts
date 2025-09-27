@@ -13,7 +13,12 @@ export class CommunityService {
   async findAll(
     page = 1,
     limit = 10,
-  ): Promise<{ data: Community[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    data: Community[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const take = Math.max(1, Math.min(100, Number(limit)));
     const currentPage = Math.max(1, Number(page));
     const skip = (currentPage - 1) * take;
@@ -22,6 +27,31 @@ export class CommunityService {
       take,
       skip,
     });
+    return { data, total, page: currentPage, limit: take };
+  }
+
+  async findByStateId(
+    stateId: number,
+    page = 1,
+    limit = 10,
+  ): Promise<{
+    data: Community[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const take = Math.max(1, Math.min(100, Number(limit)));
+    const currentPage = Math.max(1, Number(page));
+    const skip = (currentPage - 1) * take;
+
+    const [data, total] = await this.repo.findAndCount({
+      where: { state_id: stateId },
+      relations: ['state'],
+      order: { id: 'DESC' },
+      take,
+      skip,
+    });
+
     return { data, total, page: currentPage, limit: take };
   }
 
@@ -39,6 +69,7 @@ export class CommunityService {
 
   async remove(id: number): Promise<void> {
     const result = await this.repo.delete(id);
-    if (!result.affected) throw new NotFoundException(`Community ${id} not found`);
+    if (!result.affected)
+      throw new NotFoundException(`Community ${id} not found`);
   }
 }

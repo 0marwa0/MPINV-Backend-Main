@@ -32,6 +32,9 @@ import { TrustedBrandsController } from './trusted-brands/trusted-brands.control
 import { TrustedBrandsModule } from './trusted-brands/trusted-brands.module';
 import { FaqModule } from './faq/faq.module';
 import { SubCommunityService } from './sub-community/sub-community.service';
+import { ComponenyMembersService } from './componeny-members/componeny-members.service';
+import { ComponenyMembersController } from './componeny-members/componeny-members.controller';
+import { ComponenyMembersModule } from './componeny-members/componeny-members.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -57,7 +60,7 @@ import { SubCommunityService } from './sub-community/sub-community.service';
     CommunityModule,
     JobModule,
     JobApplicationModule,
-    // SubCommunityModule,
+    SubCommunityModule,
     AmenitiesModule,
     StateModule,
     // SettingsModule,
@@ -68,12 +71,14 @@ import { SubCommunityService } from './sub-community/sub-community.service';
     PartnersModule,
     TrustedBrandsModule,
     FaqModule,
+    ComponenyMembersModule,
   ],
-  providers: [ArticalsService, ArticalsService, TrustedBrandsService],
+  providers: [ArticalsService, ArticalsService, TrustedBrandsService, ComponenyMembersService],
   controllers: [
     ArticalsController,
     ListedPropertyController,
     TrustedBrandsController,
+    ComponenyMembersController,
   ],
 })
 export class AppModule {}

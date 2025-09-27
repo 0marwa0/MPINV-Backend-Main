@@ -29,6 +29,8 @@ export class OffPlanProjectController {
       { name: 'types_pdf', maxCount: 1 },
       { name: 'broucher', maxCount: 1 },
       { name: 'gallery', maxCount: 20 },
+      { name: 'property_images', maxCount: 50 }, // For property details images
+      { name: 'floor_plan_images', maxCount: 50 }, // For floor plan images
     ]),
   )
   create(@UploadedFiles() files: any, @Body() body: any) {
@@ -36,8 +38,35 @@ export class OffPlanProjectController {
     if (Array.isArray(body.project_highlights)) {
       body.project_highlights = JSON.stringify(body.project_highlights);
     }
-    if (Array.isArray(body.property_details)) {
-      body.property_details = JSON.stringify(body.property_details);
+
+    // Handle property_details with images
+    if (body.property_details) {
+      let propertyDetails = Array.isArray(body.property_details)
+        ? body.property_details
+        : JSON.parse(body.property_details);
+
+      // Process property images
+      const propertyImages = (files?.property_images as any[]) || [];
+      const floorPlanImages = (files?.floor_plan_images as any[]) || [];
+      const base = 'uploads/off_plan_projects';
+
+      propertyDetails = propertyDetails.map((detail: any, index: number) => {
+        const updatedDetail = { ...detail };
+
+        // Assign property image if available
+        if (propertyImages[index]) {
+          updatedDetail.upload_image = `${base}/${propertyImages[index].filename}`;
+        }
+
+        // Assign floor plan image if available
+        if (floorPlanImages[index]) {
+          updatedDetail.upload_floor_plan_image = `${base}/${floorPlanImages[index].filename}`;
+        }
+
+        return updatedDetail;
+      });
+
+      body.property_details = propertyDetails; // Keep as array, TypeORM will handle JSON conversion
     }
 
     // File mappings
@@ -89,6 +118,8 @@ export class OffPlanProjectController {
       { name: 'types_pdf', maxCount: 1 },
       { name: 'broucher', maxCount: 1 },
       { name: 'gallery', maxCount: 20 },
+      { name: 'property_images', maxCount: 50 }, // For property details images
+      { name: 'floor_plan_images', maxCount: 50 }, // For floor plan images
     ]),
   )
   update(
@@ -101,10 +132,35 @@ export class OffPlanProjectController {
         body.project_highlights = JSON.stringify(body.project_highlights);
       }
     }
+
+    // Handle property_details with images for updates
     if (typeof body.property_details !== 'undefined') {
-      if (Array.isArray(body.property_details)) {
-        body.property_details = JSON.stringify(body.property_details);
-      }
+      let propertyDetails = Array.isArray(body.property_details)
+        ? body.property_details
+        : JSON.parse(body.property_details);
+
+      // Process property images
+      const propertyImages = (files?.property_images as any[]) || [];
+      const floorPlanImages = (files?.floor_plan_images as any[]) || [];
+      const base = 'uploads/off_plan_projects';
+
+      propertyDetails = propertyDetails.map((detail: any, index: number) => {
+        const updatedDetail = { ...detail };
+
+        // Assign property image if available (only update if new file uploaded)
+        if (propertyImages[index]) {
+          updatedDetail.upload_image = `${base}/${propertyImages[index].filename}`;
+        }
+
+        // Assign floor plan image if available (only update if new file uploaded)
+        if (floorPlanImages[index]) {
+          updatedDetail.upload_floor_plan_image = `${base}/${floorPlanImages[index].filename}`;
+        }
+
+        return updatedDetail;
+      });
+
+      body.property_details = propertyDetails; // Keep as array, TypeORM will handle JSON conversion
     }
 
     const base = 'uploads/off_plan_projects';
@@ -130,6 +186,11 @@ export class OffPlanProjectController {
     }
 
     return this.service.update(id, body as Partial<OffPlanProject>);
+  }
+
+  @Post(':id/duplicate')
+  duplicate(@Param('id', ParseIntPipe) id: number) {
+    return this.service.duplicate(id);
   }
 
   @Delete(':id')
